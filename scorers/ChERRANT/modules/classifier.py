@@ -97,50 +97,53 @@ class Classifier:
             if error_type[0] == "T":
                 cor = Correction("W", tgt_span, (edit[1], edit[2]))
             elif error_type[0] == "D":
-                if self.granularity == "word":  # 词级别可以细分错误类型
-                    if edit[2] - edit[1] > 1:  # 词组冗余暂时分为OTHER
-                        cor = Correction("R:OTHER", "-NONE-", (edit[1], edit[2]))
-                    else:
-                        pos = self.get_pos_type(src[edit[1]][1])
-                        pos = "NOUN" if pos == "NOUN-NE" else pos
-                        pos = "MC" if tgt_span == "[缺失成分]" else pos
-                        cor = Correction("R:{:s}".format(pos), "-NONE-", (edit[1], edit[2]))
-                else:  # 字级别可以只需要根据操作划分类型即可
-                    cor = Correction("R", "-NONE-", (edit[1], edit[2]))
+                # if self.granularity == "word":  # 词级别可以细分错误类型
+                #     if edit[2] - edit[1] > 1:  # 词组冗余暂时分为OTHER
+                #         cor = Correction("R:OTHER", "-NONE-", (edit[1], edit[2]))
+                #     else:
+                #         pos = self.get_pos_type(src[edit[1]][1])
+                #         pos = "NOUN" if pos == "NOUN-NE" else pos
+                #         pos = "MC" if tgt_span == "[缺失成分]" else pos
+                #         cor = Correction("R:{:s}".format(pos), "-NONE-", (edit[1], edit[2]))
+                # else:  # 字级别可以只需要根据操作划分类型即可
+                #     cor = Correction("R", "-NONE-", (edit[1], edit[2]))
+                cor = Correction("R", "-NONE-", (edit[1], edit[2]))
             elif error_type[0] == "I":
-                if self.granularity == "word":  # 词级别可以细分错误类型
-                    if edit[4] - edit[3] > 1:  # 词组丢失暂时分为OTHER
-                        cor = Correction("M:OTHER", tgt_span, (edit[1], edit[2]))
-                    else:
-                        pos = self.get_pos_type(tgt[edit[3]][1])
-                        pos = "NOUN" if pos == "NOUN-NE" else pos
-                        pos = "MC" if tgt_span == "[缺失成分]" else pos
-                        cor = Correction("M:{:s}".format(pos), tgt_span, (edit[1], edit[2]))
-                else:  # 字级别可以只需要根据操作划分类型即可
-                    cor = Correction("M", tgt_span, (edit[1], edit[2]))
+                # if self.granularity == "word":  # 词级别可以细分错误类型
+                #     if edit[4] - edit[3] > 1:  # 词组丢失暂时分为OTHER
+                #         cor = Correction("M:OTHER", tgt_span, (edit[1], edit[2]))
+                #     else:
+                #         pos = self.get_pos_type(tgt[edit[3]][1])
+                #         pos = "NOUN" if pos == "NOUN-NE" else pos
+                #         pos = "MC" if tgt_span == "[缺失成分]" else pos
+                #         cor = Correction("M:{:s}".format(pos), tgt_span, (edit[1], edit[2]))
+                # else:  # 字级别可以只需要根据操作划分类型即可
+                #     cor = Correction("M", tgt_span, (edit[1], edit[2]))
+                cor = Correction("M", tgt_span, (edit[1], edit[2]))
             elif error_type[0] == "S":
-                if self.granularity == "word":  # 词级别可以细分错误类型
-                    if check_spell_error(src_span.replace(" ", ""), tgt_span.replace(" ", "")):
-                        cor = Correction("S:SPELL", tgt_span, (edit[1], edit[2]))
-                        # Todo 暂且不单独区分命名实体拼写错误
-                        # if edit[4] - edit[3] > 1:
-                        #     cor = Correction("S:SPELL:COMMON", tgt_span, (edit[1], edit[2]))
-                        # else:
-                        #     pos = self.get_pos_type(tgt[edit[3]][1])
-                        #     if pos == "NOUN-NE":  # 命名实体拼写有误
-                        #         cor = Correction("S:SPELL:NE", tgt_span, (edit[1], edit[2]))
-                        #     else:  # 普通词语拼写有误
-                        #         cor = Correction("S:SPELL:COMMON", tgt_span, (edit[1], edit[2]))
-                    else:
-                        if edit[4] - edit[3] > 1:  # 词组被替换暂时分为OTHER
-                            cor = Correction("S:OTHER", tgt_span, (edit[1], edit[2]))
-                        else:
-                            pos = self.get_pos_type(tgt[edit[3]][1])
-                            pos = "NOUN" if pos == "NOUN-NE" else pos
-                            pos = "MC" if tgt_span == "[缺失成分]" else pos
-                            cor = Correction("S:{:s}".format(pos), tgt_span, (edit[1], edit[2]))
-                else:  # 字级别可以只需要根据操作划分类型即可
-                    cor = Correction("S", tgt_span, (edit[1], edit[2]))
+                # if self.granularity == "word":  # 词级别可以细分错误类型
+                #     if check_spell_error(src_span.replace(" ", ""), tgt_span.replace(" ", "")):
+                #         cor = Correction("S:SPELL", tgt_span, (edit[1], edit[2]))
+                #         # Todo 暂且不单独区分命名实体拼写错误
+                #         # if edit[4] - edit[3] > 1:
+                #         #     cor = Correction("S:SPELL:COMMON", tgt_span, (edit[1], edit[2]))
+                #         # else:
+                #         #     pos = self.get_pos_type(tgt[edit[3]][1])
+                #         #     if pos == "NOUN-NE":  # 命名实体拼写有误
+                #         #         cor = Correction("S:SPELL:NE", tgt_span, (edit[1], edit[2]))
+                #         #     else:  # 普通词语拼写有误
+                #         #         cor = Correction("S:SPELL:COMMON", tgt_span, (edit[1], edit[2]))
+                #     else:
+                #         if edit[4] - edit[3] > 1:  # 词组被替换暂时分为OTHER
+                #             cor = Correction("S:OTHER", tgt_span, (edit[1], edit[2]))
+                #         else:
+                #             pos = self.get_pos_type(tgt[edit[3]][1])
+                #             pos = "NOUN" if pos == "NOUN-NE" else pos
+                #             pos = "MC" if tgt_span == "[缺失成分]" else pos
+                #             cor = Correction("S:{:s}".format(pos), tgt_span, (edit[1], edit[2]))
+                # else:  # 字级别可以只需要根据操作划分类型即可
+                #     cor = Correction("S", tgt_span, (edit[1], edit[2]))
+                cor = Correction("S", tgt_span, (edit[1], edit[2]))
             results.append(cor)
         if verbose:
             print("========== Corrections ==========")

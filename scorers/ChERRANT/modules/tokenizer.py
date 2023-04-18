@@ -2,6 +2,7 @@ from ltp import LTP
 from typing import List
 from pypinyin import pinyin, Style, lazy_pinyin
 import torch
+import thulac
 
 class Tokenizer:
     """
@@ -19,8 +20,9 @@ class Tokenizer:
         """
         self.ltp = None 
         if granularity == "word":
-            self.ltp = LTP(device=torch.device(device) if torch.cuda.is_available() else torch.device("cpu"))
-            self.ltp.add_words(words=["[缺失成分]"], max_window=6)
+            # self.ltp = LTP(device=torch.device(device) if torch.cuda.is_available() else torch.device("cpu"))
+            # self.ltp.add_words(words=["[缺失成分]"], max_window=6)
+            self.thulac = thulac.thulac()
         self.segmented = segmented
         self.granularity = granularity
         if self.granularity == "word":
@@ -69,11 +71,23 @@ class Tokenizer:
         :param input_strings: 需要分词的字符串
         :return: 分词结果
         """
-        if self.segmented:
-            seg, hidden = self.ltp.seg([input_string.split(" ") for input_string in input_strings], is_preseged=True)
-        else:
-            seg, hidden = self.ltp.seg(input_strings)
-        pos = self.ltp.pos(hidden)
+        # if self.segmented:
+        #     seg, hidden = self.ltp.seg([input_string.split(" ") for input_string in input_strings], is_preseged=True)
+        # else:
+        #     seg, hidden = self.ltp.seg(input_strings)
+        # pos = self.ltp.pos(hidden)
+
+        segs = []
+        for input_string in input_strings:
+            if self.segmented:
+                input_splits = input_string.split(" ")
+                for input_split in input_splits:
+                    segs.extend(self.thulac.cut(input_split))
+            else:
+                segs.append(self.thulac.cut(input_string))
+        seg = [[_[0] for _ in s] for s in segs]
+        pos = [[_[1] for _ in s] for s in segs]
+
         result = []
         for s, p in zip(seg, pos):
             pinyin = [lazy_pinyin(word) for word in s]
